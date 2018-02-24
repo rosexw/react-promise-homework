@@ -30,7 +30,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <h1>RECIPE LIST</h1>
+        <h1 className="header">RECIPES</h1>
         <div className="recipe-list">
           {/* This should hopefully give you some direction, but ask your TAs for help if you're stuck! */}
           {this.state.recipeList.map((item, index) =>
