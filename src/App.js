@@ -3,6 +3,7 @@ import { config } from './config';
 import './App.css';
 
 import Recipe from './Components/Recipe';
+import ErrorMessage from './Components/error-message';
 
 const APP_ID = config.APP_ID; // your app id here, provided to you when you sign up
 const APP_KEY = config.APP_KEY; // your app key here, provided to you when you sign up
@@ -16,7 +17,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      recipeList: []
+      recipeList: [],
+      errorMessage: []
     };
   }
   componentDidMount() {
@@ -25,7 +27,11 @@ class App extends Component {
       .then((result) => {
         console.log(result.hits);
         this.setState({recipeList: result.hits});
-      });
+      })
+      .catch( (error) => {
+        console.error("error: ", error)
+        this.setState({errorMessage:  [error.message]})
+      })
   }
   render() {
     return (
@@ -36,6 +42,7 @@ class App extends Component {
           {this.state.recipeList.map((item, index) =>
             <Recipe key={index} item={item} />
           )}
+          {this.state.errorMessage.map(error => <ErrorMessage message={error} />)}
         </div>
       </div>
     );
