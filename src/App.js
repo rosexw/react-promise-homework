@@ -1,18 +1,26 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {getRecipe} from "./api";
+import {RecipeItem} from "./components/recipeItem";
 
 class App extends Component {
+
+
+  state = {
+    isError: false,
+    recipes: []
+  };
+
+  componentDidMount() {
+    getRecipe('cake')
+      .then(response => response.ok ? response.json() : {isError: true})
+      .then(result => result.isError ? result : {recipes: result.hits.map(hit => hit.recipe)})
+      .then(result => this.setState(result));
+  }
+
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        {this.state.isError ? <h1>Error!</h1> : this.state.recipes.map(recipe => <RecipeItem recipe={recipe} />)}
       </div>
     );
   }
