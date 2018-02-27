@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
+
 import { config } from './config';
 import './App.css';
+
+import {getRecipe} from "./api";
+import {RecipeItem} from "./components/recipeItem";
 
 import Recipe from './Components/Recipe';
 import ErrorMessage from './Components/error-message';
@@ -14,36 +18,23 @@ const BASE_ENDPOINT = `https://api.edamam.com/search?app_id=${APP_ID}&app_key=${
 // `${BASE_ENDPOINT}&q=cake`
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      recipeList: [],
-      errorMessage: []
-    };
-  }
+
+  state = {
+    isError: false,
+    recipes: []
+  };
+
   componentDidMount() {
-    fetch(`${BASE_ENDPOINT}&q=cake`)
-      .then(response => response.json())
-      .then((result) => {
-        console.log(result.hits);
-        this.setState({recipeList: result.hits});
-      })
-      .catch( (error) => {
-        console.error("error: ", error)
-        this.setState({errorMessage:  [error.message]})
-      })
+    getRecipe('cake')
+      .then(response => response.ok ? response.json() : {isError: true})
+      .then(result => result.isError ? result : {recipes: result.hits.map(hit => hit.recipe)})
+      .then(result => this.setState(result));
   }
+
   render() {
     return (
       <div className="App">
-        <h1 className="header">RECIPES</h1>
-        <div className="recipe-list">
-          {/* This should hopefully give you some direction, but ask your TAs for help if you're stuck! */}
-          {this.state.recipeList.map((item, index) =>
-            <Recipe key={index} item={item} />
-          )}
-          {this.state.errorMessage.map(error => <ErrorMessage message={error} />)}
-        </div>
+        {this.state.isError ? <h1>Error!</h1> : this.state.recipes.map(recipe => <RecipeItem recipe={recipe} />)}
       </div>
     );
   }
